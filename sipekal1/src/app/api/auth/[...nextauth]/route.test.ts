@@ -53,26 +53,32 @@ vi.mock('drizzle-orm', () => ({
 import { authOptions } from './route';
 
 describe('Auth Route - authorize function', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let authorize: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.DATABASE_URL = 'postgres://fake:fake@localhost:5432/fake';
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const credentialsProvider = authOptions.providers.find((p: any) => p.id === 'credentials');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     authorize = (credentialsProvider as any)?.authorize;
   });
 
   describe('Validation errors', () => {
     it('should throw an error if email is missing', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(authorize({ password: 'password123' }, {} as any)).rejects.toThrow('Email and password required');
     });
 
     it('should throw an error if password is missing', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(authorize({ email: 'test@example.com' }, {} as any)).rejects.toThrow('Email and password required');
     });
 
     it('should throw an error if credentials is null', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(authorize(null, {} as any)).rejects.toThrow('Email and password required');
     });
   });
@@ -81,6 +87,7 @@ describe('Auth Route - authorize function', () => {
     it('should throw an error if user is not found', async () => {
       mockDbLimit.mockResolvedValue([]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(authorize({ email: 'nonexistent@example.com', password: 'password123' }, {} as any))
         .rejects.toThrow('No user found with that email');
 
@@ -97,8 +104,10 @@ describe('Auth Route - authorize function', () => {
         password: 'hashed_password'
       }]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (bcrypt.compare as any).mockResolvedValue(false);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(authorize({ email: 'test@example.com', password: 'wrongpassword' }, {} as any))
         .rejects.toThrow('Invalid password');
 
@@ -109,6 +118,7 @@ describe('Auth Route - authorize function', () => {
     it('should properly end sql connection even if query fails', async () => {
       mockDbLimit.mockRejectedValue(new Error('Database error'));
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(authorize({ email: 'test@example.com', password: 'password123' }, {} as any))
         .rejects.toThrow('Database error');
 
@@ -127,8 +137,10 @@ describe('Auth Route - authorize function', () => {
       };
 
       mockDbLimit.mockResolvedValue([mockUser]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (bcrypt.compare as any).mockResolvedValue(true);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await authorize({ email: 'test@example.com', password: 'correctpassword' }, {} as any);
 
       expect(result).toEqual({
@@ -146,6 +158,7 @@ describe('Auth Route - authorize function', () => {
 describe('Auth Route - callbacks', () => {
   describe('jwt callback', () => {
     it('should add role and id to token if user is present', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jwtCallback = authOptions.callbacks?.jwt as any;
       const user = { id: '1', role: 'admin' };
       const token = { name: 'test' };
@@ -156,6 +169,7 @@ describe('Auth Route - callbacks', () => {
     });
 
     it('should return token unchanged if user is not present', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jwtCallback = authOptions.callbacks?.jwt as any;
       const token = { name: 'test', id: '2', role: 'user' };
 
@@ -167,6 +181,7 @@ describe('Auth Route - callbacks', () => {
 
   describe('session callback', () => {
     it('should add role and id to session user from token', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sessionCallback = authOptions.callbacks?.session as any;
       const session = { user: { name: 'test' } };
       const token = { id: '1', role: 'admin' };
@@ -177,6 +192,7 @@ describe('Auth Route - callbacks', () => {
     });
 
     it('should return session unchanged if session user is not present', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sessionCallback = authOptions.callbacks?.session as any;
       const session = {};
       const token = { id: '1', role: 'admin' };
